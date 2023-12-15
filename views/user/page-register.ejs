@@ -1,0 +1,353 @@
+<%-include('../partials/user-header')%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Register
+                </div>
+            </div>
+        </div>
+        <section class="pt-50 pb-150">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="login_wrap widget-taber-content p-30 background-white border-radius-5">
+                            <div class="padding_eight_all bg-white">
+                                <div class="heading_s1">
+                                    <h3 class="mb-30">Create an Account</h3>
+                                </div>
+                                <p class="mb-50 font-sm">
+                                    Your personal data will be used to support your experience
+                                    throughout this website, to manage access to your account,
+                                    and for other purposes described in our privacy policy
+                                </p>
+                                <p class="text-success">
+                                    <%=locals.errorMsgSignup?errorMsgSignup:""%>
+                                </p>
+                                <form method="post" action="/register" id="signupForm">
+                                    <span id="errSignupName" class="text-danger"></span>
+                                    <div class="form-group d-flex">
+                                        <input type="text" name="fname" placeholder="First Name" />
+                                        <input type="text" name="lname" placeholder="Last Name" class="ms-2" /><br>
+                                    </div>
+                                    <span id="errSignupEmail" class="text-danger"></span>
+                                    <div class="form-group">
+                                        <input type="email" name="email" placeholder="Email" />
+                                    </div>
+                                    <span id="errSignupPassword" class="text-danger"></span>
+                                    <span id="errSignupConfirmPassword" class="text-danger"></span>
+                                    <div class="form-group d-flex">
+                                        <input type="password" name="SignupPassword" placeholder="Password" id="passwordField" />
+                                        <button class="password-toggle-button" id="passwordToggle"><i class="far fa-eye"></i></button>
+                                        <input type="password" name="Confirmpassword" placeholder="Confirm password" class="ms-2" id="confirmPasswordField" />
+                                        <button class="password-toggle-button" id="confirmPasswordToggle"><i class="far fa-eye"></i></button>
+                                    </div>                                      
+                                    <div class="form-group">
+                                    </div>
+                                    <span id="errSignupPhoneNumber" class="text-danger"></span>
+                                    <div class="form-group d-flex">
+                                        <input type="number" name="phoneNumber" placeholder="Phone Number"
+                                            id="phoneNumber" />
+                                        <button class="btn btn-success input-group-text" id="sendOTPButton">
+                                            Send OTP
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-end align-items-center mb-2">
+                                        <div id="some_div"></div>
+                                        <button disabled class="ms-2 btn btn-success input-group-text resend-otp" id="reSendOTPButton">
+                                            ResendOTP
+                                        </button>
+                                    </div>
+                                    <p class="text-danger>
+                                                <%=locals.errorMsgOTP?errorMsgOTP:""%>
+                                            </p>
+                                            <div class=" form-group d-flex">
+                                        <input type="number" name="otp" placeholder="OTP" id="otp" />
+                            </div>
+                            <span id="errSignupOtp" class="text-danger"></span>
+                            <div class="login_footer form-group">
+                                <div class="chek-form">
+                                    <div class="custome-checkbox">
+                                        <input class="form-check-input" type="checkbox" name="checkbox"
+                                            id="exampleCheckbox12" value="" />
+                                        <label class="form-check-label" for="exampleCheckbox12"><span>I
+                                                agree to terms &amp; Policy.</span></label>
+                                    </div>
+                                </div>
+                                <a href="/"><i class="fi-rs-book-alt mr-5 text-muted"></i>Learn
+                                    more</a>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-fill-out btn-block hover-up" name="login">
+                                    Submit &amp; Register
+                                </button>
+                            </div>
+                            </form>
+                            <div class="divider-text-center mt-15 mb-15">
+                                <span> or</span>
+                            </div>
+                            <div class="text-muted text-center">
+                                Already have an account? <a href="/signin">Sign in now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+           document.addEventListener("DOMContentLoaded", function () {
+
+            const passwordField = document.getElementById("passwordField");
+    const confirmPasswordField = document.getElementById("confirmPasswordField");
+    const passwordToggle = document.getElementById("passwordToggle");
+    const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
+
+    // Function to toggle password visibility
+    function togglePasswordVisibility(inputField, toggleButton) {
+      if (inputField.type === "password") {
+        inputField.type = "text";
+        toggleButton.innerHTML = '<i class="far fa-eye-slash"></i>';
+      } else {
+        inputField.type = "password";
+        toggleButton.innerHTML = '<i class="far fa-eye"></i>';
+      }
+    }
+
+    // Event listeners for password toggle buttons
+    passwordToggle.addEventListener("click", function () {
+      togglePasswordVisibility(passwordField, passwordToggle);
+    });
+
+    confirmPasswordToggle.addEventListener("click", function () {
+      togglePasswordVisibility(confirmPasswordField, confirmPasswordToggle);
+    });
+        
+
+        let timerId;
+        let timeLeft;
+        const elem = document.getElementById('some_div');
+
+        const sendOTPButton = document.getElementById("sendOTPButton");
+        const reSendButton = document.getElementById("reSendOTPButton");
+        const otpInput = document.getElementById("otp");
+
+        sendOTPButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]').value;
+
+            if (!phoneNumber) {
+                errSignupPhoneNumber.innerHTML = "Phone number is required.";
+                return;
+            }
+
+            // Start the timer
+            timeLeft = 60;
+            clearInterval(timerId);
+            timerId = setInterval(countdown, 1000);
+
+                fetch(`/send_otp?phoneNumber=${phoneNumber}`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log(data);
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'OTP Have Been Send To Registered Phone Number',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        console.log("Response from server:", data);
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Error Sending OTP',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        console.error("Error sending OTP:", error);
+                    });
+            });
+            
+            reSendButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]').value;
+
+            if (!phoneNumber) {
+                errSignupPhoneNumber.innerHTML = "Phone number is required.";
+                return;
+            }
+
+            // Start the timer
+            timeLeft = 60;
+            clearInterval(timerId);
+            timerId = setInterval(countdown, 1000);
+
+                fetch(`/send_otp?phoneNumber=${phoneNumber}`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'OTP Have Been Send To Registered Phone Number',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        console.log("Response from server:", data);
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Error Sending OTP',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        console.error("Error sending OTP:", error);
+                    });
+            });
+
+
+            // Resend OTP Coutdown
+            function countdown() {
+            if (timeLeft === -1) {
+                clearInterval(timerId);
+                document.querySelector('.resend-otp').disabled = false;
+            } else {
+                elem.innerHTML = timeLeft + ' seconds remaining';
+                timeLeft--;
+            }
+        }
+
+
+            const errEmail = document.getElementById('errEmail')
+            const errPassword = document.getElementById('errPassword')
+            const registrationForm = document.querySelector('form[action="/register"]');
+            const registrationEmailInput = document.querySelector('input[name="email"]');
+            const registrationPasswordInput = document.querySelector('input[name="SignupPassword"]');
+            const registrationConfirmPasswordInput = document.querySelector('input[name="Confirmpassword"]');
+            const registrationPhoneNumberInput = document.getElementById("phoneNumber");
+            const registrationOTPInput = document.getElementById("otp");
+
+            const errSignupEmail = document.getElementById('errSignupEmail');
+            const errSignupPassword = document.getElementById('errSignupPassword');
+            const errSignupConfirmPassword = document.getElementById('errSignupConfirmPassword');
+            const errSignupPhoneNumber = document.getElementById('errSignupPhoneNumber');
+            const errSignupOtp = document.getElementById('errSignupOtp');
+            const errSignupName = document.getElementById('errSignupName')
+
+            registrationForm.addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent the form from being submitted
+
+    if (registrationForm.querySelector('input[name="fname"]').value.trim() === "") {
+        errSignupName.innerHTML = "Please enter your First Name.";
+        return false;
+    }
+
+    if (registrationForm.querySelector('input[name="lname"]').value.trim() === "") {
+        errSignupName.innerHTML = "Please enter your Last Name.";
+        return false;
+    }
+
+    if (!isValidEmail(registrationEmailInput.value)) {
+        errSignupEmail.innerHTML = "Please enter a valid email address.";
+        return false;
+    }
+
+    if (registrationPasswordInput.value.length < 6) {
+        errSignupPassword.innerHTML = "Password must be at least 6 characters.";
+        return false;
+    }
+
+    if (registrationPasswordInput.value !== registrationConfirmPasswordInput.value) {
+        errSignupConfirmPassword.innerHTML = "Passwords do not match.";
+        return false;
+    }
+
+    if (!isValidPhoneNumber(registrationPhoneNumberInput.value)) {
+        errSignupPhoneNumber.innerHTML = "Please enter a valid phone number.";
+        return false;
+    }
+
+    if (!isValidOTP(registrationOTPInput.value)) {
+        errSignupOtp.innerHTML = "Please enter a valid OTP.";
+        return false;
+    }
+
+    const otp = otpInput.value;
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]').value;
+            const signupForm = document.querySelector("#signupForm")
+
+            if (!phoneNumber || !otp) {
+                errSignupOtp.innerHTML = "Phone number and OTP are required.";
+                return false;
+            }
+
+                fetch(`/verify_otp?phoneNumber=${phoneNumber}&otp=${otp}`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'OTP verified',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        signupForm.submit()
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Incorrect OTP OTP!',
+                            footer: '<a href="">Why do I have this issue?</a>'
+                        })
+                    });
+});
+
+
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            function isValidPhoneNumber(phoneNumber) {
+                const phoneNumberRegex = /^[0-9]{10}$/;
+                return phoneNumberRegex.test(phoneNumber);
+            }
+
+            function isValidOTP(otp) {
+                const otpRegex = /^[0-9]{6}$/;
+                return otpRegex.test(otp);
+            }
+
+        })
+
+    </script>
+
+
+    
+    <% -include('../partials/user-footer')%>

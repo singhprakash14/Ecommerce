@@ -1,0 +1,97 @@
+<%- include('../partials/admin-header')%>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+     $(document).ready(function () {
+            new DataTable('#example', {
+                                users: [[0, 'desc']] 
+                            });
+                        });
+</script>
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Users</h2>
+            <p>Registered Users.</p>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+        </header>
+        <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="example">
+                    <thead>
+                        <tr>
+                            <th>
+                            </th>
+                            <th>#ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%if(users.length>0){%>
+                            <%for(let i=0;i<users.length;i++){%>
+                        <tr>
+                            <td></td>
+                            <td><%=users[i]._id%></td>
+                            <td><b><%=users[i].email%></b></td>
+                            <td><%=users[i].firstName+" "+users[i].lastName%></td>
+                            <td><%=users[i].phoneNumber%></td>
+                            <td>
+                                <%if(users[i].isBlocked===false){%>
+                                    <span class="badge rounded-pill alert-success">Active</span>
+                                <%}else{%>
+                                    <span class="badge rounded-pill alert-danger">Blocked</span>
+                                <%}%>
+                            </td>
+                            
+                            <%if(users[i].isBlocked){%>
+                            <td class="text-end">
+                                <a href="/admin/admin_panel/user/unblock?id=<%= users[i]._id %>" class="btn btn-md rounded font-sm unblock">Unblock</a>
+                            </td>
+                            <%}else{%>
+                                <td class="text-end">
+                                    <a href="/admin/admin_panel/user/block?id=<%= users[i]._id %>" class="btn  rounded font-sm btn-danger block">Block</a>
+                                </td>
+                            <%}%>
+                        </tr>
+                        <%}%>
+                        <%}else{%>
+                            <tr>No Users Found</tr>
+                        <%}%>
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive//end -->
+        </div>
+        <!-- card-body end// -->
+    </div>
+</section>
+<script>
+    document.querySelector('.block').addEventListener('click',()=>{
+        Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'User Blocked',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+    })
+    document.querySelector('.unblock').addEventListener('click',()=>{
+        Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'User UnBlocked',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+    })
+</script>
+<%- include('../partials/admin-footer')%>

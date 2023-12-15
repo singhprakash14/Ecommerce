@@ -1,0 +1,155 @@
+<%- include('../partials/admin-header')%>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+            new DataTable('#example', {
+              products: [[0, 'desc']] 
+                            });
+                        });
+</script>
+
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Products List</h2>
+      <p>List of products that have been added.</p>
+    </div>
+    <div>
+      <a
+        href="/admin/admin_panel/add_products"
+        class="btn btn-primary btn-sm rounded"
+        >Create new</a
+      >
+    </div>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+      <!-- <div class="row align-items-center">
+        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+          <select class="form-select">
+            <option selected>All category</option>
+            <option>Electronics</option>
+            <option>Clothes</option>
+            <option>Automobile</option>
+          </select>
+        </div>
+        <div class="col-md-2 col-6">
+          <select class="form-select">
+            <option selected>Status</option>
+            <option>Active</option>
+            <option>Disabled</option>
+            <option>Show all</option>
+          </select>
+        </div>
+      </div> -->
+    </header>
+    <!-- card-header end// -->
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover" id="example">
+          <thead>
+            <tr>
+              <th></th>
+              <th>#ID</th>
+              <th>Thumbnail</th>
+              <th>Brand</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Stock</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (products.length > 0) { %> 
+              <% products.forEach((product) =>{%>
+            <tr>
+              <td></td>
+              <td><%=product.id%></td>
+              <td>
+                <% if (product.productImage &&
+                product.productImage.length > 0) { %>
+                <img
+                  src="/<%= product.productImage[0].path %>"
+                  class="img-sm img-thumbnail"
+                  alt="product Image"
+                />
+                <% } else { %> No image <% } %>
+              </td>
+              <td><%=product.brand%></td>
+              <td><b><%=product.productName%></b></td>
+              <td><%=product.description%></td>
+              <td><%=product.category%></td>
+              <td><%=product.stock%></td>
+              <td><%=product.regularPrice%></td>
+              <td>
+                <% if (product.isBlocked) { %>
+                <span class="badge rounded-pill alert-danger">Blocked</span>
+                <% } else { %>
+                <span class="badge rounded-pill alert-success">Active</span>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <a
+                  href="/admin/edit_products?id=<%= product._id%>"
+                  class="btn btn-md rounded font-sm mb-2"
+                  >Edit</a
+                >
+
+                <% if (product.isBlocked) { %>
+                <a
+                  href="/admin/unblock_products?id=<%= product._id %>"
+                  class="btn btn-md rounded font-sm unblock"
+                  >Unblock</a
+                >
+                <% } else { %>
+                <a
+                  href="/admin/block_products?id=<%= product._id %>"
+                  class="btn btn-danger rounded font-sm block"
+                  >Block</a
+                >
+                <% } %>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="10">No Products Found</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+      <!-- table-responsive//end -->
+    </div>
+  </div>
+  <!-- card end// -->
+
+</section>
+
+<script>
+  document.querySelector('.unblock').addEventListener('click',()=>{
+    Swal.fire({
+  position: 'top-end',
+  icon: 'success',
+  title: 'User Unblocked',
+  showConfirmButton: false,
+  timer: 1500
+  })
+})
+  document.querySelector('.block').addEventListener('click',(event)=>{
+    Swal.fire({
+  position: 'top-end',
+  icon: 'success',
+  title: 'User Blocked',
+  showConfirmButton: false,
+  timer: 1500
+  })
+})
+</script>
+<!-- content-main end// -->
+<%- include('../partials/admin-footer')%>

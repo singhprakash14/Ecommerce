@@ -1,0 +1,194 @@
+﻿<%- include('../partials/user-header')%>
+  <main class="main">
+    <div class="page-header breadcrumb-wrap">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="/" rel="nofollow">Home</a>
+          <span></span> Shop <span></span> Your Cart
+        </div>
+      </div>
+    </div>
+    <section class="mt-50 mb-50">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <%if(userCart){%>
+              <div class="table-responsive">
+                <table class="table shopping-summery text-center clean">
+                  <thead>
+                    <tr class="main-heading">
+                      <th scope="col">Image</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Subtotal</th>
+                      <th scope="col">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%for(let i=0;i<userCart.products.length;i++){%>
+                      <tr>
+                        <td class="image product-thumbnail">
+                          <img class="thumbnail"
+                            src="<%= userCart.products[i].productId.productImage[0].path %>"
+                            alt="" />
+                        </td>
+                        <td class="product-des product-name">
+                          <h5 class="product-name">
+                            <a href="/product?id=<%=userCart.products[i].productId._id%>">
+                              <%=userCart.products[i].productId.productName%>
+                            </a>
+                          </h5>
+                          <p class="font-xs">
+                            <%=userCart.products[i].productId.brand%>
+                          </p>
+                        </td>
+                        <td class="price" data-title="Price"><span>
+                          ₹<%=userCart.products[i].productId.salePrice%>
+                          </span></td>
+                        <td class="text-center" data-title="Stock">
+                          <div class="detail-qty border radius m-auto">
+                            <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                            <span class="qty-val" data-productId="<%=userCart.products[i].productId._id%>">
+                              <%=userCart.products[i].quantity%>
+                            </span>
+                            <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                          </div>
+                        </td>
+                        <td class="text-right" data-title="Cart">
+                          <span>
+                            ₹<%=userCart.products[i].productId.salePrice*userCart.products[i].quantity%>
+                          </span>
+                        </td>
+                        <td class="action" data-title="Remove">
+                          <a href="/cart/delete?productId=<%=userCart.products[i].productId._id%>" class="text-muted"><i
+                              class="fi-rs-trash"></i></a>
+                        </td>
+                      </tr>
+                      <%}%>
+                  </tbody>
+                </table>
+              </div>
+              <div class="cart-action text-end">
+                <a class="btn" href="/products"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+              </div>
+              <div class="divider center_icon mt-50 mb-50">
+                <i class="fi-rs-fingerprint"></i>
+              </div>
+              <div class="row mb-50">
+                <div class="col-lg-6 col-md-12">
+                </div>
+                <div class="col-lg-6 col-md-12">
+                  <div class="border p-md-4 p-30 border-radius cart-totals">
+                    <div class="heading_s1 mb-3">
+                      <h4>Cart Totals</h4>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table">
+                        <tbody>
+                          <tr>
+                            <td class="cart_total_label">Cart Subtotal</td>
+                            <td class="cart_total_amount">
+                              <span class="font-lg fw-900 text-brand">
+                                ₹<%=grandTotal%>
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="cart_total_label">Shipping</td>
+                            <td class="cart_total_amount">
+                              <i class="ti-gift mr-5"></i> Free Shipping
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="cart_total_label">Total</td>
+                            <td class="cart_total_amount">
+                              <strong><span class="font-xl fw-900 text-brand">
+                                ₹<%=grandTotal%>
+                                </span></strong>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <a href="/checkout" class="btn">
+                      <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                  </div>
+                </div>
+              </div>
+              <%}else{%>
+                <h3>No items in cart</h3>
+                <%}%>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.qty-up').forEach(element => {
+    element.addEventListener('click', (event) => {
+      event.preventDefault();
+      var quantityElement = element.closest('.detail-qty').querySelector('.qty-val');
+      var quantity = parseInt(quantityElement.textContent, 10);
+      quantity += 1;
+      quantityElement.textContent = quantity;
+
+      updateServerQuantity(quantityElement);
+    });
+  });
+
+  document.querySelectorAll('.qty-down').forEach(element => {
+    element.addEventListener('click', (event) => {
+      event.preventDefault();
+      var quantityElement = element.closest('.detail-qty').querySelector('.qty-val');
+      var quantity = parseInt(quantityElement.textContent, 10);
+      if (quantity > 1) {
+        quantity -= 1;
+        quantityElement.textContent = quantity;
+
+        updateServerQuantity(quantityElement);
+      }
+    });
+  });
+
+  function updateServerQuantity(quantityElement) {
+    const productId = quantityElement.getAttribute('data-productId');
+    var quantity = quantityElement.textContent;
+    fetch(`/cart/update?productId=${productId}&quantity=${quantity}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId: productId,
+        quantity: Number(quantity),
+      }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data updated successfully:', data);
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Cart Updated',
+          showConfirmButton: false,
+          timer: 1500,
+        })
+      })
+      .catch(error => {
+        console.error('Error:' + error);
+      });
+  }
+});
+
+  </script>
+
+  <%-include('../partials/user-footer')%>

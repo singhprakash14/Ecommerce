@@ -1,0 +1,188 @@
+<%- include('../partials/admin-header')%>
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Dashboard</h2>
+      <p>Whole data about business here</p>
+    </div>
+    <div>
+      <div>
+        <a href="/admin/salesReport/excel" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report XLSX</a
+        >
+      </div>
+      <div class="mt-2">
+        <a href="/admin/salesReport/pdf" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report PDF</a
+        >
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-primary-light"
+            ><i class="text-primary material-icons md-monetization_on"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Revenue</h6>
+            <span>₹<%=revenue%></span>
+            <span class="text-sm"> Shipping fees are not included </span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-success-light"
+            ><i class="text-success material-icons md-local_shipping"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Orders</h6>
+            <span><%=orders.length%></span>
+            <span class="text-sm"> Total orders </span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-warning-light"
+            ><i class="text-warning material-icons md-qr_code"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Products</h6>
+            <span><%=products.length%></span>
+            <span class="text-sm"> In <%=categories.length%> Categories </span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-success-light"
+            ><i class="text-success material-icons md-local_shipping"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Canceled</h6>
+            <span><%=cancelledOrder.length%></span>
+            <span class="text-sm"> Total Canceled orders </span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-success-light"
+            ><i class="text-success material-icons md-local_shipping"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Returned</h6>
+            <span><%=returnedOrder.length%></span>
+            <span class="text-sm"> Total Returned orders </span>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle bg-success-light"
+            ><i class="text-success material-icons md-local_shipping"></i
+          ></span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Delivered</h6>
+            <span><%=deliveredOrder.length%></span>
+            <span class="text-sm"> Total Delivered orders </span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-8 col-lg-12">
+      <div class="card mb-4">
+        <article class="card-body">
+          <h5 class="card-title">Sale statistics</h5>
+          <!-- <canvas id="myChart" height="120px"></canvas> -->
+          <canvas id="myChartNew" height="120px"></canvas>
+        </article>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" class="monthlySalesCounts" data-monthlySalesCounts='<%= JSON.stringify(monthlySalesCounts) %>'>
+  <input type="hidden" class="yearlySalesCounts" data-yearlySalesCounts='<%= JSON.stringify(yearlySalesCounts) %>'>
+  <input type="hidden" class="weeklySalesCounts" data-weeklySalesCounts='<%= JSON.stringify(weeklySalesCounts) %>'>
+  <input type="hidden" class="dailySalesCounts" data-dailySalesCounts='<%= JSON.stringify(dailySalesCounts) %>'>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const monthlySalesCountsData = document.querySelector('.monthlySalesCounts').getAttribute('data-monthlySalesCounts');
+  const yearlySalesCountsData = document.querySelector('.yearlySalesCounts').getAttribute('data-yearlySalesCounts');
+  const weeklySalesCountsData = document.querySelector('.weeklySalesCounts').getAttribute('data-weeklySalesCounts');
+  const dailySalesCountsData = document.querySelector('.dailySalesCounts').getAttribute('data-dailySalesCounts');
+
+  const monthlySalesCounts = JSON.parse(monthlySalesCountsData);
+  const yearlySalesCounts = JSON.parse(yearlySalesCountsData);
+  const weeklySalesCounts = JSON.parse(weeklySalesCountsData);
+  const dailySalesCounts = JSON.parse(dailySalesCountsData);
+  
+  var ctx = document.getElementById('myChartNew').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            
+            data: {
+                // labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                {
+                        label: 'Yearly Sales',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(4, 209, 130, 0.2)',
+                        borderColor: 'rgb(4, 209, 130)',
+                        data: yearlySalesCounts,
+                    },  
+                {
+                        label: 'Monthly Sales',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(44, 120, 220, 0.2)',
+                        borderColor: 'rgba(44, 120, 220)',
+                        data: monthlySalesCounts,
+                    },
+                   
+                    {
+                        label: 'Weekly Sales',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(380, 200, 230, 0.2)',
+                        borderColor: 'rgb(100, 100, 230)',
+                        data: weeklySalesCounts,
+                    },
+                    {
+                        label: 'Daily Sales',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(380, 200, 230, 0.2)',
+                        borderColor: 'rgb(380, 200, 230)',
+                        data: dailySalesCounts,
+                    }
+
+                ]
+            },
+            options: {
+                plugins: {
+                legend: {
+                    labels: {
+                    usePointStyle: true,
+                    },
+                }
+                }
+            }
+        });
+  </script>
+  
+<%- include('../partials/admin-footer')%>

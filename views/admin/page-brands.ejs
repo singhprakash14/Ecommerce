@@ -1,0 +1,130 @@
+<%- include('../partials/admin-header')%>
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Brand</h2>
+      <p>Brand management</p>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+      <!-- <div class="row gx-3">
+        <div class="col-lg-4 mb-lg-0 mb-15 me-auto">
+          <input type="text" placeholder="Search..." class="form-control" />
+        </div>
+      </div> -->
+    </header>
+    <!-- card-header end// -->
+    <div class="card-body">
+      <div class="row gx-3">
+        <div class="col-xl-4 col-lg-6 col-md-8 col-12">
+          <form method="post" action="/admin/admin_panel/brand/add" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="mb-4">
+              <label for="brandId" class="form-label">#ID</label>
+              <input
+                type="number"
+                class="form-control"
+                id="brandId"
+                name="brandId"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="brandName" class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="brandName"
+                name="brandName"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Block</label>
+              <select class="form-select" name="isBlocked" required>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <div class="input-upload">
+                <img src="admin-assets/imgs/theme/upload.svg" alt="">
+                <input class="form-control" type="file" name="brandLogo" required>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">
+                Create Brand
+              </button>
+            </div>
+          </form>          
+        </div>
+        <%if(brands){%>
+          <%for(let i=0;i<brands.length;i++){%>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+              <figure class="card border-1">
+                <div class="card-header bg-white text-center">
+                  <img
+                    height="76p"
+                    src="/<%= brands[i].brandImage.path%>"
+                    alt="Logo"
+                  />
+                </div>
+                <figcaption class="card-body text-center">
+                  <h6 class="card-title m-0"><%=brands[i].brandName%></h6>
+                  <!-- <a href="#"> 398 items </a> -->
+                  <%if(brands[i].isBlocked){%>
+                    <span class="badge rounded-pill alert-danger">Blocked</span>
+                <%}else{%>
+                    <span class="badge rounded-pill alert-success">Active</span>
+                <%}%>
+                </figcaption>
+                <div class="d-flex justify-content-between ">
+                 <a href="/admin/admin_panel/edit_brand?id=<%=brands[i]._id%>" class="btn btn-lg font-sm btn-success rounded">Edit</a>
+                <%if(brands[i].isBlocked){%>
+                  <a href="/admin/admin_panel/brand/unblock?id=<%=brands[i]._id%>" class="btn btn-lg font-sm btn-success rounded">Unblock</a>
+              <%}else{%>
+                  <a href="/admin/admin_panel/brand/block?id=<%=brands[i]._id%>" class="btn btn-lg font-sm btn-danger rounded">Block</a>
+              <%}%>
+                </div>
+              </figure>
+            </div>
+          <%}%>
+        <%}else{%>
+          <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+            <h4>No Brands Found</h4>
+          </div>
+        <%}%>
+      </div>
+      <!-- row.// -->
+    </div>
+    <!-- card-body end// -->
+  </div>
+
+</section>
+<!-- content-main end// -->
+
+<script>
+  function validateForm() {
+  var brandId = document.getElementById("brandId").value;
+  var brandName = document.getElementById("brandName").value.trim();
+  var isBlocked = document.querySelector('select[name="isBlocked"]').value;
+  var brandLogo = document.querySelector('input[name="brandLogo"]').value;
+
+  // Number validation for brandId
+  if (isNaN(brandId)) {
+    alert("#ID must be a valid number.");
+    return false; // Prevent form submission
+  }
+
+  // Check if brandName is empty
+  if (brandName === "") {
+    alert("Name field cannot be empty.");
+    return false; // Prevent form submission
+  }
+
+  // All fields are valid, allow form submission
+  return true;
+}
+</script>
+<%- include('../partials/admin-footer')%>

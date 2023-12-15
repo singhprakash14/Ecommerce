@@ -1,0 +1,151 @@
+<%- include('../partials/admin-header')%>
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Banner</h2>
+      <p>Banner management</p>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+   
+    </header>
+
+    <div class="card-body">
+      <div class="row gx-3">
+        <div class="col-xl-4 col-lg-6 col-md-8 col-12">
+          <form method="post" action="/admin/banner_management/add" enctype="multipart/form-data" onsubmit="return validateDates()">
+            <div class="mb-4">
+              <label for="description" class="form-label">Description</label>
+              <input
+                type="text"
+                placeholder="Type here"
+                class="form-control"
+                id="description"
+                name="description"
+              />
+            </div>
+            <div class="mb-4">
+              <label for="startDate" class="form-label">Start Date</label>
+              <input
+                type="date"
+                placeholder="Type here"
+                class="form-control"
+                id="startDate"
+                name="startDate"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="endDate" class="form-label">End Date</label>
+              <input
+                type="date"
+                placeholder="Type here"
+                class="form-control"
+                id="endDate"
+                name="endDate"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Status</label>
+              <select class="form-select" name="isBlocked">
+                  <option value=true> True </option>
+                  <option value=false> False </option>
+              </select>
+          </div>
+            <div class="mb-4">
+                <div class="input-upload">
+                  <img src="admin-assets/imgs/theme/upload.svg" alt="">
+                  <input class="form-control" type="file" name="bannerImage">
+              </div>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">
+                Create Banner
+              </button>
+            </div>
+          </form>
+        </div>
+        <%if(banners){%>
+            <% banners.forEach((banner) => { %>
+            <div class="col-xl-4 col-lg-6 col-md-8 col-12">
+              <figure class="card border-1">
+                <div class="card-header bg-white text-center">
+                  <img
+                    height="100p"
+                    src="/<%=banner.bannerImage.path%>"
+                    alt="Logo"
+                  />
+                </div>
+                <figcaption class="card-body text-center">
+                  <h6 class="card-title m-0">Description : <%= banner.description%></h6>
+                  <a href="#">Start Date : <%= moment(banner.startDate).format('MMMM Do YYYY') %> </a><br>
+                  <a href="#">End Date : <%= moment(banner.endDate).format('MMMM Do YYYY') %> </a><br>
+                    <!-- <span class="badge rounded-pill alert-danger">Blocked</span> -->
+                    <%if(banner.status){%>
+                    <span class="badge rounded-pill alert-danger">Blocked : <%= banner.status %></span>
+                    <%}else{%>
+                      <span class="badge rounded-pill alert-success">Blocked : <%= banner.status %></span>
+                    <%}%>
+                </figcaption>
+                <div class="d-flex justify-content-between ">
+                 <a href="/admin/banner/edit?bannerId=<%=banner._id%>" class="btn btn-lg font-sm btn-success rounded">Edit</a>
+                  <!-- <a href="" class="btn btn-lg font-sm btn-success rounded">Unblock</a> -->
+                  <%if(banner.status){%>
+                    <a href="/admin/banner/unblock?bannerId=<%=banner._id%>" class="btn btn-lg font-sm btn-success rounded">Unblock</a>
+                  <%} else{%>
+                    <a href="/admin/banner/block?bannerId=<%=banner._id%>" class="btn btn-lg font-sm btn-danger rounded">Block</a>
+                  <%}%>
+                </div>
+              </figure>
+            </div>
+            <%})%>
+            <%} else {%>
+          <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+            <h4>No Banner Found</h4>
+          </div>
+            <%}%>
+      </div>
+      <!-- row.// -->
+    </div>
+    <!-- card-body end// -->
+  </div>
+
+</section>
+
+<script>
+  function validateDates() {
+    // Get input values
+    var description = document.getElementById("description").value.trim();
+    var startDate = new Date(document.getElementById("startDate").value);
+    var endDate = new Date(document.getElementById("endDate").value);
+    var isBlocked = document.querySelector('select[name="isBlocked"]').value;
+    var bannerImage = document.querySelector('input[name="bannerImage"]').value;
+  
+ 
+    if (description === "") {
+      alert("Description field cannot be empty.");
+      return false; 
+    }
+  
+  
+    if (endDate <= startDate) {
+      alert("End date must be greater than the start date.");
+      return false; 
+    }
+  
+    if (bannerImage === "") {
+      alert("Please select a banner image.");
+      return false; 
+    }
+  
+
+    return true;
+  }
+  </script>
+  
+  
+  
+<!-- content-main end// -->
+<%- include('../partials/admin-footer')%>

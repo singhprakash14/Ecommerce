@@ -1,0 +1,324 @@
+﻿<%- include('../partials/user-header')%>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row flex-row-reverse">
+                    <div class="col-lg-9">
+                        <div class="shop-product-fillter">
+                            <div class="totall-product">
+                                <p> We found <strong class="text-brand">
+                                        <%=products.length%>
+                                    </strong> items for you!</p>
+                            </div>
+                        </div>
+                        <div class="row product-grid-3">
+                            <%if(products){%>
+                                <% products.filter(product=> !product.isBlocked).forEach(function(product) { %>
+                                    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                                        <div class="product-cart-wrap mb-30">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/product?id=<%=product._id%>">
+                                                        <img class="default-img"
+                                                            src="<%= product.productImage[0].path %>"
+                                                            alt="">
+                                                        <img class="hover-img"
+                                                            src="<%= product.productImage[0].path %>"
+                                                            alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="product-action-1">
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up add-to-wishlist"
+                                                        href="" data-productId="<%=product._id%>"><i class="fi-rs-heart"></i></a>
+                                                </div>
+                                                <div class="product-badges product-badges-position product-badges-mrg">
+                                                    <span class="hot">Hot</span>
+                                                </div>
+                                            </div>
+                                            <div class="product-content-wrap">
+                                                <div class="product-category">
+                                                    <a href="">
+                                                        <%=product.brand%>
+                                                    </a>
+                                                </div>
+                                                <h2><a href="">
+                                                        <%=product.productName%>
+                                                    </a></h2>
+                                                <div class="rating-result" title="90%">
+                                                    <span>
+                                                        <span><%=Math.round(100-((product.salePrice/product.regularPrice)*100))%>%</span>
+                                                    </span>
+                                                </div>
+                                                <div class="product-price">
+                                                    <span>
+                                                        <%=product.salePrice%>
+                                                    </span>
+                                                    <span class="old-price">
+                                                        <%=product.regularPrice%>
+                                                    </span>
+                                                </div>
+                                                <div class="product-action-1 show">
+                                                    <a aria-label="Add To Cart" class="action-btn hover-up add-to-cart"
+                                                    data-productId="<%=product._id%>"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <%})%>
+                                        <%}else{%>
+                                            <h1>No Products Found</h1>
+                                            <%}%>
+                        </div>
+                        <!--pagination-->
+                        <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-start">
+                                    <%if(products){%>
+                                        <% for (let i = 1; i < Math.ceil(products.length / 12)+2; i++) { %>
+                                            <li class="page-item active">
+                                              <a class="page-link" href="/products?page=<%= i %>"><%= i %></a>
+                                            </li>
+                                          <% } %>                                          
+                                    <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
+                                    <%}%>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 primary-sidebar sticky-sidebar">
+                        <button class="btn btn-primary mb-2" onclick="window.location.href='/products'">Clear Filter</button>
+                        <div class="widget-category mb-30">
+                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
+                            <ul class="categories">
+                                <%if(categories){%>
+                                    <%for(let i=0;i<categories.length;i++){%>
+                                        <li><a href="/search?category=<%=categories[i].categoryName%>">
+                                                <%=categories[i].categoryName%>
+                                            </a></li>
+                                        <%}%>
+                                            <%}else{%>
+                                                <li><a href="">No Categories Found</a></li>
+                                                <%}%>
+                            </ul>
+                        </div>
+                        <!-- Fillter By Price -->
+                        <div class="sidebar-widget price_range range mb-30">
+                            <div class="widget-header position-relative mb-20 pb-10">
+                                <h5 class="widget-title mb-10">Fill by price</h5>
+                                <div class="bt-1 border-color-1"></div>
+                            </div>
+                            <form action="/search" method="post">
+                            <div class="price-filter">
+                                <div class="price-filter-inner">
+                                    <div id="slider-range"></div>
+                                    <div class="price_slider_amount">
+                                        <div class="label-input">
+                                            <span>Range:</span><input type="number" id="amount" name="price"
+                                                placeholder="Enter Your Price" class="border-color-1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group">
+                                <div class="list-group-item mb-10 mt-10">
+                                    <label class="fw-900">Brand</label>
+                                    <div class="custome-checkbox">
+                                        <%if(brands){%>
+                                            <%for(let i=0;i<brands.length;i++){%>
+                                                <input class="form-check-input" type="checkbox" name="brand"
+                                                    id="<%=brands[i].brandName%>" value="<%=brands[i].brandName%>">
+                                                <label class="form-check-label" for="<%=brands[i].brandName%>"><span>
+                                                        <%=brands[i].brandName%>
+                                                    </span></label>
+                                                <br>
+                                                <%}%>
+                                                    <%}else{%>
+                                                        <span>No Brands Found</span>
+                                                        <%}%>
+
+                                    </div>
+                                    
+                                        <label class="fw-900 mt-15">RAM</label>
+                                        <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="ram" id="2" value="2">
+                                            <label class="form-check-label" for="2"><span>2 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="ram" id="4" value="4">
+                                            <label class="form-check-label" for="4"><span>4 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="ram" id="6" value="6">
+                                            <label class="form-check-label" for="6"><span>6 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="ram" id="8" value="8">
+                                            <label class="form-check-label" for="8"><span>8 GB and Above</span></label>
+                                            <br>
+                                        </div>
+                                        <label class="fw-900 mt-15">INTERNAL MEMORY</label>
+                                        <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="internal_memory"
+                                                id="16" value="16">
+                                            <label class="form-check-label" for="16"><span>16 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="internal_memory"
+                                                id="32" value="32">
+                                            <label class="form-check-label" for="32"><span>32 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="internal_memory"
+                                                id="64" value="64">
+                                            <label class="form-check-label" for="64"><span>64 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="internal_memory"
+                                                id="128" value="128">
+                                            <label class="form-check-label" for="128"><span>128 GB</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="internal_memory"
+                                                id="256" value="256">
+                                            <label class="form-check-label" for="256"><span>256 GB and
+                                                    Above</span></label>
+                                            <br>
+                                        </div>
+                                        <label class="fw-900 mt-15">BATTERY CAPACITY</label>
+                                        <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="battery_capacity"
+                                                id="Under 5000" value="5000">
+                                            <label class="form-check-label" for="Under 5000"><span>5000
+                                                    mAh</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="battery_capacity"
+                                                id="Under 10000" value="10000">
+                                            <label class="form-check-label" for="Under 10000"><span>10000
+                                                    mAh</span></label>
+                                            <br>
+                                        </div>
+                                        <label class="fw-900 mt-15">OPERATING SYSTEM</label>
+                                        <div class="custome-checkbox">
+                                            <input class="form-check-input" type="checkbox" name="operating_system"
+                                                id="android" value="Android">
+                                            <label class="form-check-label" for="android"><span>Android</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="operating_system"
+                                                id="iOS" value="iOS">
+                                            <label class="form-check-label" for="iOS"><span>iOS</span></label>
+                                            <br>
+                                            <input class="form-check-input" type="checkbox" name="operating_system"
+                                                id="Windows" value="Windows">
+                                            <label class="form-check-label" for="Windows"><span>Windows</span></label>
+                                            <br>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <button class="btn btn-sm btn-defaul" type="submit"><i class="fi-rs-filter mr-5"></i>
+                                    Fillter</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <input type="hidden" data-isLogin="<%=isLogin%>" class="isLogin">
+
+    </main>
+
+    <script>
+        var isLogin= document.querySelector('.isLogin').getAttribute('data-isLogin')
+
+        document.querySelectorAll('.add-to-cart').forEach(element => {
+          element.addEventListener('click', (event) => {
+            event.preventDefault();
+            if(isLogin){
+                var productId = element.getAttribute('data-productId')
+            fetch(`/cart`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                productId: productId,
+                quantity: 1
+              })
+            }).then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json() 
+            })
+              .then(data => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Added to Cart',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                console.log('Data updated successfully:', data);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+            } else{
+                Swal.fire({
+          icon: 'error',
+          title: 'Please Login',
+          text: 'You Need to Login in order to Add to Cart',
+          footer: '<a href="/signin">Login Page?</a>'
+        })
+            }
+          })
+        });
+
+        
+    document.querySelectorAll('.add-to-wishlist').forEach(element => {
+      element.addEventListener('click', (event) => {
+        event.preventDefault();
+        if(isLogin){
+            var productId = element.getAttribute('data-productId')
+        fetch(`/wishlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId: productId,
+          })
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json() 
+        })
+          .then(data => {
+            Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Added to Wishlist',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            console.log('Data updated successfully:', data);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        } else {
+            Swal.fire({
+          icon: 'error',
+          title: 'Please Login',
+          text: 'You Need to Login in order to Add to Wishlist',
+          footer: '<a href="/signin">Login Page?</a>'
+        })
+        }
+      })
+    });
+    
+      </script>
+
+    <%-include('../partials/user-footer')%>

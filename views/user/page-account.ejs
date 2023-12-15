@@ -1,0 +1,424 @@
+﻿<%- include('../partials/user-header')%>
+
+  <main class="main">
+    <div class="page-header breadcrumb-wrap">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="/" rel="nofollow">Home</a>
+          <span></span> Account
+        </div>
+      </div>
+    </div>
+    <section class="pt-150 pb-150">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 m-auto">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="dashboard-menu">
+                  <ul class="nav flex-column" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab"
+                        aria-controls="dashboard" aria-selected="false"><i
+                          class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab"
+                        aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Orders</a>
+                    </li>
+                    <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      id="track-orders-tab"
+                      data-bs-toggle="tab"
+                      href="#track-orders"
+                      role="tab"
+                      aria-controls="track-orders"
+                      aria-selected="false"
+                      ><i class="fi-rs-shopping-bag mr-10"></i>Wallet</a
+                    >
+                  </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab"
+                        aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab"
+                        aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account
+                        details</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="tab-content dashboard-content">
+                  <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5 class="mb-0">Hello <%=locals.userName%>
+                        </h5>
+                      </div>
+                      <div class="card-body">
+                        <p>
+                          From your account dashboard. you can easily check &amp;
+                          view your <a href="#">recent orders</a>, manage your
+                          <a href="#">shipping and billing addresses</a> and
+                          <a href="#">edit your password and account details.</a>
+                        </p>
+                        <p>Full Name : <%=userName%></p>
+                        <p>Email ID : <%=user.email%></p>
+                        <p>Phone Number : <%=user.phoneNumber%></p>
+                      </div>
+                    </div>
+                    <div class="card mt-3">
+                      <div class="card-header">
+                        <h5 class="mb-0">Coupons
+                        </h5>
+                      </div>
+                      <% coupons.forEach((coupon, index) => { %>
+                        <div class="card-body">
+                          <p class="btn-group">Coupon Code : 
+                            <input type="text" value="<%= coupon.couponCode %>" id="myInput<%= index %>" disabled>
+                            <p>Coupon Description : <%= coupon.description %></p>
+                            <p>Expiry Date : <%= moment(coupon.expiryDate).format('MMMM Do YYYY') %></p>
+                            <% if (coupon.redeemedUsers.includes(user._id)) { %>
+                              <p class="text-danger">REDEEMED</p>
+                            <% } else{ %>
+                              <p class="text-success">NOT REDEEMED</p>
+                            <% } %>
+                            <button onclick="copyText(<%= index %>)" class="btn">Copy text</button>
+                          </p>
+                          <hr>
+                        </div>
+                      <% }) %>                                                                
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5 class="mb-0">Your Orders</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="table-responsive">
+                          <table class="table" id="example">
+                            <thead>
+                              <tr>
+                                <th>Order</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <%if(orders){%>
+                                <%orders.forEach((order)=>{%>
+                                  <tr>
+                                    <td><%=order.referenceId%></td>
+                                    <td><%=moment(order.createdOn).format('MMMM Do YYYY, h:mm:ss a')%></td>
+                                    <%if(order.orderStatus==='Delivered'){%>
+                                      <td><span class="badge rounded-pill alert-success"><%=order.orderStatus%></span></td>
+                                      <%}else if(order.status==="Canceled"){%>
+                                        <td><span class="badge rounded-pill alert-danger"><%=order.orderStatus%></span></td>
+                                      <%}else{%>
+                                        <td><span class="badge rounded-pill alert-warning"><%=order.orderStatus%></span></td>
+                                      <%}%>
+                                    <td><%=order.totalAmount%></td>
+                                    <td>
+                                      <a href="/invoice?orderId=<%=order._id%>" class="btn-small d-block btn mb-2">View</a>
+                                      <% if (["Awaiting Payment", "Confirmed", "Shipped", "Order Placed"].includes(order.orderStatus) && order.paymentStatus !== "Failure") { %>
+                                        <a href="/order/cancel?orderId=<%=order._id%>" class="btn btn-small d-block mb-2 btn-danger">CANCEL</a>
+                                      <% } else if (order.orderStatus === "Canceled") { %>
+                                        <button class="btn btn-danger" disabled>CANCELED</button>
+                                      <% } else if (order.orderStatus === "Returned") { %>
+                                        <button class="btn btn-warning" disabled>RETURNED</button>
+                                      <% } else if (order.paymentStatus === "Failure") { %>
+                                        <button class="btn btn-danger" disabled>PAYMENT FAILED</button>
+                                      <% } else if (order.orderStatus === "Delivered") { %>
+                                        <a href="/order/return?orderId=<%=order._id%>" class="btn btn-small d-block mb-2 btn-warning">RETURN</a>
+                                      <% } %>                                      
+                                    </td>
+                                  </tr>
+                                <%})%>
+                              <%}else{%>
+                                <tr>
+                                  <h3>No Orders Found</h3>
+                                </tr>
+                              <%}%>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="track-orders" role="tabpanel" aria-labelledby="track-orders-tab">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5 class="mb-0"> Wallet Balance : <%=wallet.amount%> </h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="table-responsive">
+                          <table class="table" id="example1">
+                            <thead>
+                              <tr>
+                                <th>Order</th>
+                                <th>Date</th>
+                                <th>Order Status</th>
+                                <th>Payement Status</th>
+                                <th>Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <%if(WalletOrders){%>
+                                <%WalletOrders.forEach((order)=>{%>
+                                  <tr>
+                                    <td><%=order.referenceId%></td>
+                                    <td><%=moment(order.createdOn).format('MMMM Do YYYY, h:mm:ss a')%></td>
+                                    <%if(order.orderStatus==='Delivered'){%>
+                                      <td><span class="badge rounded-pill alert-success"><%=order.orderStatus%></span></td>
+                                      <%}else if(order.status==="Canceled"){%>
+                                        <td><span class="badge rounded-pill alert-danger"><%=order.orderStatus%></span></td>
+                                      <%}else{%>
+                                        <td><span class="badge rounded-pill alert-warning"><%=order.orderStatus%></span></td>
+                                      <%}%>
+                                    <%if(order.paymentStatus==='Success'){%>
+                                      <td><span class="badge rounded-pill alert-success"><%=order.paymentStatus%></span></td>
+                                      <%}else if(order.paymentStatus==="Failure"){%>
+                                        <td><span class="badge rounded-pill alert-danger"><%=order.paymentStatus%></span></td>
+                                      <%}else{%>
+                                        <td><span class="badge rounded-pill alert-warning"><%=order.paymentStatus%></span></td>
+                                      <%}%>
+                                    
+                                    <td><%=order.totalAmount%></td>
+                                  </tr>
+                                <%})%>
+                              <%}else{%>
+                                <tr>
+                                  <h3>No Orders Found</h3>
+                                </tr>
+                              <%}%>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                    <div class="row">
+                      <div class="col-md-12 mb-3">
+                        <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit" onclick="window.location.href=`/address/add`">
+                          <a style="text-decoration: none; color: white;">Add Address</a>
+                        </button>
+                      </div> 
+                      <%if(userAddress){%>
+                        <%userAddress.address.forEach((address)=>{%>
+                      <div class="col-lg-6">
+                        <div class="card  mb-3 mb-lg-0">
+                          <div class="card-header">
+                            <h5 class="mb-0"><%=address.addressType%></h5>
+                          </div>
+                            
+                          <div class="card-body">
+                            <address>
+                              <%=address.name%><br />
+                              <%=address.city%>,<br />
+                              <%=address.landMark%> <br /><%=address.state%>
+                            </address>
+                            <p><%=address.pincode%></p>
+                            <p><%=address.phone%></p>
+                            <p><%=address.altPhone%></p>
+                            <div class="d-flex justify-content-between">
+                              <a href="/address/edit?id=<%=address._id%>" class="btn-small">Edit</a>
+                              <a href="/address/delete?id=<%=address._id%>" class="btn-small">Delete</a>
+                            </div>
+                          </div>    
+                        </div>
+                      </div>
+                      <%})%>
+                      <%}else{%>
+                        <div class="col-lg-6">
+                          <div class="card  mb-3 mb-lg-0">
+                            <div class="card-header">
+                              <h5 class="mb-0"></h5>
+                            </div>
+                        <div class="card-body">
+                          <address>
+                            No address
+                          </address>
+                        </div>
+                        </div>
+                      </div>
+                      <%}%>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5>Account Details</h5>
+                      </div>
+                      <div class="card-body">
+                        <p>
+                          Already have an account?
+                          <a href="/signin">Log in instead!</a>
+                        </p>
+                        <form method="post" action="/profile/update">
+                          <div class="row">
+                            <div class="form-group col-md-6">
+                              <label>First Name <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="firstName" type="text" value="<%=user.firstName%>"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                              <label>Last Name <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="lastName"  value="<%=user.lastName%>"/>
+                            </div>
+                            <!-- <div class="form-group col-md-12">
+                              <label>Display Name
+                                <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="dname" type="text" value="<%=userName%>"/>
+                            </div> -->
+                            <div class="form-group col-md-12">
+                              <label>Email Address
+                                <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="email" type="email" value="<%=user.email%>"/>
+                            </div>
+                            <div class="form-group col-md-12">
+                              <label>Current Password
+                                <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="password" type="password" />
+                            </div>
+                            <div class="form-group col-md-12">
+                              <label>New Password
+                                <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="newPassword" type="password" />
+                            </div>
+                            <div class="form-group col-md-12">
+                              <label>Confirm Password
+                                <span class="required">*</span></label>
+                              <input required="" class="form-control square" name="confirmNewPassword" type="password" />
+                            </div>
+                            <div class="col-md-12">
+                              <button type="submit" class="btn btn-fill-out submit">
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script>
+    $(document).ready(function () {
+            new DataTable('#example', {
+                                orders: [[0, 'desc']] 
+                            });
+                        });
+    $(document).ready(function () {
+            new DataTable('#example1', {
+                                orders: [[0, 'desc']] 
+                            });
+                        });
+
+  function copyText(index) {
+  var copyText = document.getElementById("myInput" + index);
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(copyText.value)
+    .then(function() {
+      alert("Copied the text: " + copyText.value);
+    })
+    .catch(function(err) {
+      console.error("Error copying text: " + err);
+    });
+}
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  document.querySelector('form[action="/profile/update"]').addEventListener('submit',(event)=>{
+    event.preventDefault()
+    var firstName = document.getElementsByName("firstName")[0].value.trim();
+    var lastName = document.getElementsByName("lastName")[0].value.trim();
+    var email = document.getElementsByName("email")[0].value.trim();
+    var password = document.getElementsByName("password")[0].value.trim();
+    var newPassword = document.getElementsByName("newPassword")[0].value.trim();
+    var confirmNewPassword = document.getElementsByName("confirmNewPassword")[0].value.trim();
+
+    if (firstName === "") {
+      alert("First Name is required.");
+      return false;
+    }
+
+    if (lastName === "") {
+      alert("Last Name is required.");
+      return false;
+    }
+
+    if (email === "") {
+      alert("Email Address is required.");
+      return false;
+    }
+
+    if(!isValidEmail(email)){
+      alert("Enter valid Email ID")
+    }
+
+    if (password === "") {
+      alert("Current Password is required.");
+      return false;
+    }
+
+    if (newPassword === "") {
+      alert("New Password is required.");
+      return false;
+    }
+
+    if (newPassword.length < 6) {
+      alert("Password Must be minimum of six character long.");
+      return false;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      alert("New Password and Confirm Password do not match.");
+      return false;
+    }
+
+    fetch(`/profile/update`,{ 
+      method : "POST",
+      headers : {
+        "Content-Type" : "application/json"
+      },
+      body : JSON.stringify({ firstName, lastName, email, password, newPassword })
+     })
+     .then((response)=>{
+      if(response.ok){
+        alert("DATA UPDATED")
+        window.location.href='/logout'
+      } else {
+        alert("CURRENT PASSWORD DOESN'T MATCH")
+        window.location.href="/profile"
+      }
+     })
+     .catch((error)=>{
+      alert("Error Occurred while updating details, try after sometimes!")
+      window.location.href="/profile"
+     })
+  })
+
+  </script>
+  <%-include('../partials/user-footer')%>
