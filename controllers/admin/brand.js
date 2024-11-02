@@ -1,5 +1,3 @@
-
-
 const { brandModel } = require('../../Model')
 
 const getBrands = async (req, res) => {

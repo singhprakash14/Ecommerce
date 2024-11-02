@@ -1,0 +1,5 @@
+.env
+node_modules
+Public/sales-report/sales_report.xlsx
+Public/sales-report/sales_report.pdf
+.vercel

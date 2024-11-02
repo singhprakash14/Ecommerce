@@ -8,9 +8,13 @@
   </div>
   <div class="card mb-4">
     <header class="card-header">
-   
+      <!-- <div class="row gx-3">
+        <div class="col-lg-4 mb-lg-0 mb-15 me-auto">
+          <input type="text" placeholder="Search..." class="form-control" />
+        </div>
+      </div> -->
     </header>
-
+    <!-- card-header end// -->
     <div class="card-body">
       <div class="row gx-3">
         <div class="col-xl-4 col-lg-6 col-md-8 col-12">
@@ -123,24 +127,25 @@
     var isBlocked = document.querySelector('select[name="isBlocked"]').value;
     var bannerImage = document.querySelector('input[name="bannerImage"]').value;
   
- 
+    // Check if the description field is empty after trimming
     if (description === "") {
       alert("Description field cannot be empty.");
-      return false; 
+      return false; // Prevent form submission
     }
   
-  
+    // Check if the end date is greater than the start date
     if (endDate <= startDate) {
       alert("End date must be greater than the start date.");
-      return false; 
+      return false; // Prevent form submission
     }
   
+    // Check if a banner image is selected
     if (bannerImage === "") {
       alert("Please select a banner image.");
-      return false; 
+      return false; // Prevent form submission
     }
   
-
+    // All fields are valid, allow form submission
     return true;
   }
   </script>

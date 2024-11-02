@@ -1,12 +1,11 @@
 {
-  "name": "electro-e-commerce",
+  "name": "Ecommerce",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js"
   },
-  "author": "prakash singh",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",

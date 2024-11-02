@@ -10,7 +10,6 @@ const getAdminLogin = async (req, res) => {
   res.render("admin-login");
 };
 
-
 const postAdminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
